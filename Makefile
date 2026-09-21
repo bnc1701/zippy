@@ -1,51 +1,41 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c11 -Iinclude -O2
-LDFLAGS =
-
-SRC_DIR = src
-BUILD_DIR = build
-TEST_DIR = tests
-
-TARGET = $(BUILD_DIR)/zippy
-
-# main program sources, main.c is excluded from the shared object list
-# used by tests since tests bring their own main function
-LIB_SRC = $(filter-out $(SRC_DIR)/main.c, $(wildcard $(SRC_DIR)/*.c))
-LIB_OBJ = $(LIB_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
-
-MAIN_OBJ = $(BUILD_DIR)/main.o
+cc = gcc
+cflags = -Wall -Wextra -Werror -std=c11 -Iinclude -O2
+src_dir = src
+build_dir = build
+test_dir = tests
+bin = $(build_dir)/zippy
+lib_src = $(filter-out $(src_dir)/main.c,$(wildcard $(src_dir)/*.c))
+lib_obj = $(lib_src:$(src_dir)/%.c=$(build_dir)/%.o)
+main_obj = $(build_dir)/main.o
+test_bins = $(build_dir)/test_bitio $(build_dir)/test_huffman $(build_dir)/test_roundtrip
 
 .PHONY: all clean test
 
-all: $(TARGET)
+all: $(bin)
 
-$(TARGET): $(MAIN_OBJ) $(LIB_OBJ)
-	$(CC) $(MAIN_OBJ) $(LIB_OBJ) -o $(TARGET) $(LDFLAGS)
+$(bin): $(main_obj) $(lib_obj)
+	$(cc) $(main_obj) $(lib_obj) -o $(bin)
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(build_dir)/%.o: $(src_dir)/%.c
+	@mkdir -p $(build_dir)
+	$(cc) $(cflags) -c $< -o $@
 
-# each test file has its own main and links against the library objects
+$(build_dir)/test_bitio: $(test_dir)/test_bitio.c $(lib_obj)
+	@mkdir -p $(build_dir)
+	$(cc) $(cflags) $< $(lib_obj) -o $@
 
-TEST_BINARIES = $(BUILD_DIR)/test_bitio $(BUILD_DIR)/test_huffman $(BUILD_DIR)/test_roundtrip
+$(build_dir)/test_huffman: $(test_dir)/test_huffman.c $(lib_obj)
+	@mkdir -p $(build_dir)
+	$(cc) $(cflags) $< $(lib_obj) -o $@
 
-$(BUILD_DIR)/test_bitio: $(TEST_DIR)/test_bitio.c $(LIB_OBJ)
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< $(LIB_OBJ) -o $@
+$(build_dir)/test_roundtrip: $(test_dir)/test_roundtrip.c $(lib_obj)
+	@mkdir -p $(build_dir)
+	$(cc) $(cflags) $< $(lib_obj) -o $@
 
-$(BUILD_DIR)/test_huffman: $(TEST_DIR)/test_huffman.c $(LIB_OBJ)
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< $(LIB_OBJ) -o $@
-
-$(BUILD_DIR)/test_roundtrip: $(TEST_DIR)/test_roundtrip.c $(LIB_OBJ)
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< $(LIB_OBJ) -o $@
-
-test: $(TEST_BINARIES)
-	@for bin in $(TEST_BINARIES); do \
+test: $(test_bins)
+	@for bin in $(test_bins); do \
 		./$$bin || exit 1; \
 	done
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(build_dir)
