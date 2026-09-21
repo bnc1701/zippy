@@ -6,12 +6,14 @@
 
 #include "huffman.h"
 
+// encoded output state
 typedef struct {
     size_t output_size;
     uint8_t tail;
     uint8_t tail_bits;
 } encode_state;
 
+// encode input bytes into packed output bytes
 int encode_huffman(
     const uint8_t *input,
     size_t input_size,

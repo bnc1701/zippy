@@ -1,5 +1,6 @@
 #include "encode.h"
 
+// encode input with the portable c path
 static int encode_huffman_c(
     const uint8_t *input,
     size_t input_size,
@@ -41,6 +42,7 @@ extern size_t encode_huffman_x86_64(
 );
 #endif
 
+// select the native path when the target supports it
 int encode_huffman(
     const uint8_t *input,
     size_t input_size,
