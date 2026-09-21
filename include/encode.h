@@ -22,4 +22,13 @@ int encode_huffman(
     encode_state *state
 );
 
+// encode input with the c reference path
+int encode_huffman_reference(
+    const uint8_t *input,
+    size_t input_size,
+    const huffman_code codes[HUFFMAN_SYMBOLS],
+    uint8_t *output,
+    encode_state *state
+);
+
 #endif

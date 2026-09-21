@@ -13,7 +13,7 @@ ifeq ($(shell uname -m),x86_64)
 asm_obj = $(build_dir)/encode_x86_64.o
 endif
 
-test_bins = $(build_dir)/test_bitio $(build_dir)/test_huffman $(build_dir)/test_roundtrip
+test_bins = $(build_dir)/test_bitio $(build_dir)/test_encode $(build_dir)/test_huffman $(build_dir)/test_roundtrip
 
 .PHONY: all clean test
 
@@ -31,6 +31,10 @@ $(build_dir)/%.o: $(src_dir)/%.S
 	$(cc) -c $< -o $@
 
 $(build_dir)/test_bitio: $(test_dir)/test_bitio.c $(lib_obj) $(asm_obj)
+	@mkdir -p $(build_dir)
+	$(cc) $(cflags) $< $(lib_obj) $(asm_obj) -o $@
+
+$(build_dir)/test_encode: $(test_dir)/test_encode.c $(lib_obj) $(asm_obj)
 	@mkdir -p $(build_dir)
 	$(cc) $(cflags) $< $(lib_obj) $(asm_obj) -o $@
 

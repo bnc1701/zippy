@@ -1,7 +1,7 @@
 #include "encode.h"
 
 // encode input with the portable c path
-static int encode_huffman_c(
+int encode_huffman_reference(
     const uint8_t *input,
     size_t input_size,
     const huffman_code codes[HUFFMAN_SYMBOLS],
@@ -55,6 +55,6 @@ int encode_huffman(
     state->output_size = encode_huffman_x86_64(input, input_size, codes, output, state);
     return 0;
 #else
-    return encode_huffman_c(input, input_size, codes, output, state);
+    return encode_huffman_reference(input, input_size, codes, output, state);
 #endif
 }
